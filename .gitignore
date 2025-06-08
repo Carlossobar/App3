@@ -21,3 +21,9 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+
+# Haskell compilados
+App3
+
+# Otros archivos del sistema
+.DS_Store
