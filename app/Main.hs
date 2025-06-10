@@ -11,9 +11,10 @@ type Camino = [Pos]
 -- Bosque de ejemplo: matriz de 3x3
 bosqueEjemplo :: Bosque
 bosqueEjemplo = 
-  [ [ 2, -3, 1]
-  , [-5, 4, 0]
-  , [ 1, 3, 2]
+  [ [2, -3, 1, 4]
+  , [-5, 4, 0, 2]
+  , [1, 3, 2, 3]
+  , [0, 0, 0, 0]
   ]
 
 -- HITO 2: Obtener el valor de la runa en una celda
@@ -51,11 +52,12 @@ movimientosPosibles bosque pos@(x, y) camino =
 -- Movimiento horizontal/vertical cuesta 1, diagonal cuesta 2
 -- Trampa (runa = 0) resta 3 adicional
 energiaPaso :: Int -> Pos -> Pos -> Bosque -> Int
-energiaPaso energiaActual pos1@(x1, y1) pos2@(x2, y2) bosque =
-  let runa = valorDeRuna bosque pos2
+energiaPaso energiaActual (x1, y1) (x2, y2) bosque =
+  let runa = valorDeRuna bosque (x2, y2)
       costoMovimiento = if x1 /= x2 && y1 /= y2 then 2 else 1
       penalizacion = if runa == 0 then 3 else 0
   in energiaActual - costoMovimiento + runa - penalizacion
+
 
 -- HITO 4: Calcular energía total de un camino completo
 energiaTotal :: Int -> Camino -> Bosque -> Int
@@ -90,16 +92,17 @@ encontrarMejorCamino bosque energiaInicial =
   let (filas, cols) = dimensionesBosque bosque
       inicio = (0, 0)
       fin = (filas - 1, cols - 1)
-      todosLosCaminos = encontrarCaminos bosque energiaInicial inicio fin [inicio]
+      todosLosCaminos = nub (encontrarCaminos bosque energiaInicial inicio fin [inicio])
       caminosValidos = filter (\c -> caminoValido energiaInicial c bosque) (map reverse todosLosCaminos)
       energias = map (\c -> energiaTotal energiaInicial c bosque) caminosValidos
       maxEnergia = if null energias then -1 else maximum energias
   in filter (\c -> energiaTotal energiaInicial c bosque == maxEnergia) caminosValidos
 
+
 -- Función principal con ejemplos
 main :: IO ()
 main = do
-  let energiaInicial = 12
+  let energiaInicial = 5
   
   putStrLn "Bosque:"
   print bosqueEjemplo
